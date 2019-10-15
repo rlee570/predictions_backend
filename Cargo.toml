@@ -8,8 +8,17 @@ edition = "2018"
 
 [dependencies]
 rocket = "0.4.2"
-rocket_contrib="0.4.2"
-serde="1.0.101"
+serde={version="1.0.101", feautres=["derive"]}
 serde_derive = "1.0.101"
+serde_json = "1.0"
 rocket_cors ="0.5.0"
 hyper="0.12.35"
+diesel = {version="1.4.3",features=["postgres","chrono"]}
+rust-crypto="0.2.36"
+frank_jwt = "3.1.1"
+diesel-derive-enum = { version = "0.4",features=["postgres"]}
+
+[dependencies.rocket_contrib]
+version = "0.4.2"
+default-features=false
+features=["json","diesel_postgres_pool"]

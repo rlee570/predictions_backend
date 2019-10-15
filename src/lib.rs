@@ -4,16 +4,20 @@
 extern crate rocket;
 #[macro_use]
 extern crate rocket_contrib;
-#[macro_use]
+
 extern crate serde_derive;
 #[macro_use]
 extern crate rocket_cors;
+#[macro_use]
+extern crate diesel;
 
 use rocket::http::Method;
 use rocket_contrib::json::JsonValue;
-use rocket_cors::{AllowedHeaders, AllowedOrigins, Cors, CorsOptions, Error};
+use rocket_cors::{AllowedHeaders, AllowedOrigins, Cors, CorsOptions};
+mod db;
 mod models;
-use models::user::User;
+mod routes;
+mod schema;
 
 fn make_cors() -> Cors {
     let allowed_origins = AllowedOrigins::some_exact(&[
@@ -41,19 +45,21 @@ fn make_cors() -> Cors {
 
 #[get("/")]
 fn index() -> &'static str {
-    "Hello,World"
+    "Server up and running"
 }
 
-#[get("/<id>")]
-fn get_user(id: i32) -> JsonValue {
-    let mut user = User::new(id, "Some", "Person", "some_person@email.com","password", 100);
-    user.set_first_name("Jeff");
-    json!(user)
+#[catch(404)]
+fn not_found() -> JsonValue {
+    json!({
+        "status":"error",
+        "reason":"Resource was not found"
+    })
 }
 
 pub fn start() -> rocket::Rocket {
     rocket::ignite()
-        .mount("/api", routes![index])
-        .mount("/api/user", routes![get_user])
+        .mount("/api", routes![index, routes::users::get_user])
+        .attach(db::Conn::fairing())
         .attach(make_cors())
+        .register(catchers![not_found])
 }
