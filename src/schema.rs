@@ -1,10 +1,10 @@
 table! {
-    users {
-        id -> Integer,
+    users (id) {
+        id -> Int4,
         email -> Text,
         first_name -> Text,
         last_name -> Text,
-        points -> Integer,
+        points -> Int4,
         role -> Text,
         hash -> Text,
     }

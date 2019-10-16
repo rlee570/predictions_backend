@@ -1,10 +1,10 @@
 use crate::models::user::User;
 use crate::schema::users;
-use crypto::scrypt::{scrypt, scrypt_check, scrypt_simple, ScryptParams};
-use diesel::result::{DatabaseErrorKind, Error};
-use diesel::{Insertable, RunQueryDsl};
+use crypto::scrypt::{scrypt_check, scrypt_simple, ScryptParams};
+use diesel::pg::PgConnection;
 use diesel::prelude::*;
-use diesel::PgConnection;
+use diesel::result::{DatabaseErrorKind, Error};
+use serde::Deserialize;
 
 pub enum UserCreationError {
     DuplicatedEmail,
@@ -40,7 +40,7 @@ pub fn create(
     first_name: &str,
     last_name: &str,
     role: &str,
-) -> Result<User,UserCreationError>{
+) -> Result<User, UserCreationError> {
     // see https://blog.filippo.io/the-scrypt-parameters
     let hash = &scrypt_simple(password, &ScryptParams::new(14, 8, 1)).expect("hash error");
 
@@ -66,7 +66,8 @@ pub fn login(conn: &PgConnection, email: &str, password: &str) -> Option<User> {
         .ok()?;
 
     let password_matches = scrypt_check(password, &user.hash)
-        .map_err(|err| eprintln!("login_user: scrypt_check: {}", err)).ok()?;
+        .map_err(|err| eprintln!("login_user: scrypt_check: {}", err))
+        .ok()?;
 
     if password_matches {
         Some(user)
@@ -77,4 +78,12 @@ pub fn login(conn: &PgConnection, email: &str, password: &str) -> Option<User> {
         );
         None
     }
+}
+
+pub fn find(conn: &PgConnection, id: i32) -> Option<User> {
+    users::table
+        .find(id)
+        .get_result(conn)
+        .map_err(|err| println!("find_user:{}", err))
+        .ok()
 }

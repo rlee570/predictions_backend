@@ -21,4 +21,4 @@ log = "critical"
 limits = { forms = 32768 }
 
 [global.databases]
-diesel_postgres_pool={url="postgres://postgres@localhost/predictions"}
+diesel_postgres_pool = { url = "postgres://postgres@localhost/predictions"}

@@ -1,4 +1,5 @@
 use diesel::Queryable;
+use serde::Serialize;
 //use diesel_derive_enum::DbEnum;
 
 //#[derive(DbEnum)]
@@ -15,7 +16,8 @@ pub struct User {
     pub email: String,
     pub points: i32,
     pub role: String,
-    pub hash: String
+    #[serde(skip_serializing)]
+    pub hash: String,
 }
 
 impl User {
@@ -26,7 +28,7 @@ impl User {
         email: &str,
         points: i32,
         role: &str,
-        hash: &str
+        hash: &str,
     ) -> User {
         User {
             id,
@@ -35,7 +37,7 @@ impl User {
             email: email.to_string(),
             points,
             role: role.to_string(),
-            hash: hash.to_string()
+            hash: hash.to_string(),
         }
     }
     pub fn set_first_name(&mut self, first_name: &str) {
