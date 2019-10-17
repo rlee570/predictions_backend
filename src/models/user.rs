@@ -1,5 +1,8 @@
 use diesel::Queryable;
 use serde::Serialize;
+use frank_jwt as jwt;
+use chrono::{Duration,Utc};
+use crate::models::user_config as config;
 //use diesel_derive_enum::DbEnum;
 
 //#[derive(DbEnum)]
@@ -18,6 +21,32 @@ pub struct User {
     pub role: String,
     #[serde(skip_serializing)]
     pub hash: String,
+}
+
+#[derive(Deserialize, Serialize)]
+pub struct UserJWT{
+    id:i32,
+    email: String,
+    first_name:String,
+    last_name: String,
+    token: String
+}
+
+#[derive(Debug,Deserialize,Serialize)]
+pub struct Payload{
+    pub expiry:i64,
+    pub id: i32,
+    pub email:String
+}
+
+impl Payload{
+    pub fn new(expiry:i64,id:i32,email:&str) ->Payload{
+        Payload{
+            expiry,
+            id,
+            email:email.to_string()
+        }
+    }
 }
 
 impl User {
@@ -40,6 +69,27 @@ impl User {
             hash: hash.to_string(),
         }
     }
+
+    pub fn to_user_jwt(&self) -> UserJWT {
+        let headers = json!({});
+        let exp = Utc::now() + Duration::minutes(15);
+        let payload = json!(Payload::new(exp.timestamp(),self.id,self.email.as_str()));
+        let token = jwt::encode(
+            headers.0,
+            &config::SECRET.to_string(),
+            &payload,
+            jwt::Algorithm::HS256
+        ).expect("jwt");
+        let jwt_token = UserJWT {
+            id:self.id,
+            email:self.email.clone(),
+            first_name: self.first_name.clone(),
+            last_name: self.last_name.clone(),
+            token
+        };
+        jwt_token
+    }
+
     pub fn set_first_name(&mut self, first_name: &str) {
         self.first_name = first_name.to_string();
     }

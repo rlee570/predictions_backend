@@ -14,6 +14,12 @@ pub struct NewUser {
     password: String,
 }
 
+#[derive(Deserialize)]
+pub struct LoginData {
+    email: String,
+    password: String,
+}
+
 //#[derive(Deserialize, Validate)]
 //struct NewUserData {
 //    #[validate(length(min="1"))]
@@ -28,12 +34,12 @@ pub struct NewUser {
 //}
 
 #[get("/user/<id>")]
-pub fn get_user(id: i32,conn: db::Conn) -> Option<JsonValue> {
-    db::users::find(&conn,id).map(|user|json!({"user":user}))
+pub fn get_user(id: i32, conn: db::Conn) -> Option<JsonValue> {
+    db::users::find(&conn, id).map(|user| json!({ "user": user }))
 }
 
 #[post("/user", format = "json", data = "<new_user>")]
-pub fn create_user(new_user: Json<NewUser>, conn: Conn) -> Result<JsonValue, JsonValue> {
+pub fn post_create_user(new_user: Json<NewUser>, conn: Conn) -> Result<JsonValue, JsonValue> {
     db::users::create(
         &conn,
         new_user.email.as_ref(),
@@ -52,4 +58,11 @@ pub fn create_user(new_user: Json<NewUser>, conn: Conn) -> Result<JsonValue, Jso
             "reason":"email already in use"
         })
     })
+}
+
+#[post("/user/login", format = "json", data = "<user>")]
+pub fn post_user_login(user: Json<LoginData>, conn: db::Conn) -> Result<JsonValue, JsonValue> {
+    db::users::login(&conn, user.email.as_ref(), user.password.as_ref())
+        .map(|user| json!({ "user": user.to_user_jwt() }))
+        .ok_or_else(|| json!({"error":"username or password is invalid"}))
 }

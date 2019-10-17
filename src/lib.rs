@@ -58,7 +58,10 @@ fn not_found() -> JsonValue {
 
 pub fn start() -> rocket::Rocket {
     rocket::ignite()
-        .mount("/api", routes![index, routes::users::create_user,routes::users::get_user])
+        .mount(
+            "/api",
+            routes![index,routes::users::get_user, routes::users::post_create_user, routes::users::post_user_login],
+        )
         .attach(db::Conn::fairing())
         .attach(make_cors())
         .register(catchers![not_found])
