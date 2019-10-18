@@ -65,8 +65,7 @@ fn extract_token_from_header(header: &str) -> Option<&str> {
 }
 
 fn decode_token(token: &str) -> Option<Payload> {
-    println!("{}",token);
-    jwt::decode("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IlBlcnNvbiIsImV4cGlyeSI6MTU3Mzk2MDA0OSwiaWQiOjF9.3yhMFlLXMDYxMfsF3PQGWzi_QPXxGKuqtAQFZprlXAs", &config::SECRET.to_string(), jwt::Algorithm::HS256)
+    jwt::decode(token.trim(), &config::SECRET.to_string(), jwt::Algorithm::HS256)
         .map(|(_, payload)| {
             serde_json::from_value::<Payload>(payload)
                 .map_err(|err| {
