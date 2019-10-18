@@ -80,10 +80,19 @@ pub fn login(conn: &PgConnection, email: &str, password: &str) -> Option<User> {
     }
 }
 
-pub fn find(conn: &PgConnection, id: i32) -> Option<User> {
+pub fn find_by_id(conn: &PgConnection, id: i32) -> Option<User> {
     users::table
         .find(id)
         .get_result(conn)
         .map_err(|err| println!("find_user:{}", err))
         .ok()
+}
+
+pub fn find_by_email(conn: &PgConnection, email: &str) -> Option<User> {
+    users::table
+        .filter(users::email.eq(email))
+        .get_result(conn)
+        .map_err(|err| eprintln!("find_by_email:{}", err))
+        .ok()
+
 }

@@ -60,7 +60,13 @@ pub fn start() -> rocket::Rocket {
     rocket::ignite()
         .mount(
             "/api",
-            routes![index,routes::users::get_user, routes::users::post_create_user, routes::users::post_user_login],
+            routes![
+                index,
+                routes::users::get_user_by_id,
+                routes::users::get_user_by_email,
+                routes::users::post_create_user,
+                routes::users::post_user_login
+            ],
         )
         .attach(db::Conn::fairing())
         .attach(make_cors())

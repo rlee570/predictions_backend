@@ -1,8 +1,10 @@
-use crate::models::user::User;
+use crate::models::user::{User, UserJWT, Payload};
 use rocket_contrib::json::{Json, JsonValue};
 //use crate::db::users::NewUser;
 use crate::db;
 use crate::db::Conn;
+use crate::models::user_config as config;
+use frank_jwt as jwt;
 use serde::Deserialize;
 use validator::Validate;
 
@@ -34,8 +36,13 @@ pub struct LoginData {
 //}
 
 #[get("/user/<id>")]
-pub fn get_user(id: i32, conn: db::Conn) -> Option<JsonValue> {
-    db::users::find(&conn, id).map(|user| json!({ "user": user }))
+pub fn get_user_by_id(id: i32, auth: Payload, conn: db::Conn) -> Option<JsonValue> {
+    db::users::find_by_id(&conn, id).map(|user| json!(user))
+}
+
+#[get("/user/email?<email>")]
+pub fn get_user_by_email(email: String, auth: Payload, conn: db::Conn) -> Option<JsonValue> {
+    db::users::find_by_email(&conn, email.as_ref()).map(|user| json!(user))
 }
 
 #[post("/user", format = "json", data = "<new_user>")]
@@ -61,7 +68,7 @@ pub fn post_create_user(new_user: Json<NewUser>, conn: Conn) -> Result<JsonValue
 }
 
 #[post("/user/login", format = "json", data = "<user>")]
-pub fn post_user_login(user: Json<LoginData>, conn: db::Conn) -> Result<JsonValue, JsonValue> {
+pub fn post_user_login(user: Json<LoginData>, conn: Conn) -> Result<JsonValue, JsonValue> {
     db::users::login(&conn, user.email.as_ref(), user.password.as_ref())
         .map(|user| json!({ "user": user.to_user_jwt() }))
         .ok_or_else(|| json!({"error":"username or password is invalid"}))
