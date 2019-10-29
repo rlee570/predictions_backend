@@ -17,9 +17,9 @@ use serde::Serialize;
 #[derive(Queryable, Serialize)]
 pub struct User {
     pub id: i32,
+    pub email: String,
     pub first_name: String,
     pub last_name: String,
-    pub email: String,
     pub points: i32,
     pub role: String,
     #[serde(skip_serializing)]

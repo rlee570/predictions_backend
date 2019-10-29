@@ -11,3 +11,5 @@ Cargo.lock
 
 #Idea files because of IDE
 .idea
+
+/.cargo/
