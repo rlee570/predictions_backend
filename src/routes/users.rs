@@ -1,7 +1,7 @@
-use crate::models::user::Payload;
-use rocket_contrib::json::{Json, JsonValue};
 use crate::db;
 use crate::db::Conn;
+use crate::models::user::Payload;
+use rocket_contrib::json::{Json, JsonValue};
 
 #[derive(Deserialize)]
 pub struct NewUser {

@@ -40,11 +40,11 @@ pub fn create(
     votes: &i32,
 ) -> Result<Prediction, PredictionError> {
     let new_prediction = &NewPrediction {
-        owner:*owner,
-        statement:statement.to_string(),
-        expiry:expiry,
-        outcome:*outcome,
-        votes:*votes,
+        owner: *owner,
+        statement: statement.to_string(),
+        expiry,
+        outcome: *outcome,
+        votes: *votes,
     };
     diesel::insert_into(predictions::table)
         .values(new_prediction)
@@ -67,8 +67,8 @@ pub fn find_all(conn: &PgConnection) -> Option<Vec<Prediction>> {
         .ok()
 }
 
-#[derive(Deserialize,AsChangeset, Default,Clone)]
-#[table_name="predictions"]
+#[derive(Deserialize, AsChangeset, Default, Clone)]
+#[table_name = "predictions"]
 pub struct UpdatePrediction {
     pub owner: Option<i32>,
     pub statement: Option<String>,
@@ -77,10 +77,10 @@ pub struct UpdatePrediction {
     pub votes: Option<i32>,
 }
 
-pub fn update(conn: &PgConnection,id:i32,data:&UpdatePrediction) -> Option<Prediction>{
-    let data = &UpdatePrediction{
-        owner:None,
-        expiry:None,
+pub fn update(conn: &PgConnection, id: i32, data: &UpdatePrediction) -> Option<Prediction> {
+    let data = &UpdatePrediction {
+        owner: None,
+        expiry: None,
         ..data.clone()
     };
     diesel::update(predictions::table.find(id))
