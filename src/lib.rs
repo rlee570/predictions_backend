@@ -69,6 +69,7 @@ pub fn start() -> rocket::Rocket {
                 routes::predictions::get_prediction_by_id,
                 routes::predictions::get_all_predictions,
                 routes::predictions::post_create_prediction,
+                routes::predictions::put_prediction
             ],
         )
         .attach(db::Conn::fairing())

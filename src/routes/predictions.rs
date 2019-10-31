@@ -3,6 +3,7 @@ use crate::db::Conn as connection;
 use crate::models::user::Payload;
 use chrono::NaiveDate;
 use rocket_contrib::json::{Json, JsonValue};
+use crate::db::predictions::UpdatePrediction as update;
 
 #[derive(Deserialize)]
 pub struct NewPrediction {
@@ -13,6 +14,11 @@ pub struct NewPrediction {
     votes: i32,
 }
 
+#[derive(Deserialize)]
+pub struct UpdatePrediction {
+    prediction:update,
+}
+
 #[get("/prediction/<id>")]
 pub fn get_prediction_by_id(id: i32, _auth: Payload, conn: connection) -> Option<JsonValue> {
     predictions::find_by_id(&conn, id).map(|prediction| json!(prediction))
@@ -21,6 +27,11 @@ pub fn get_prediction_by_id(id: i32, _auth: Payload, conn: connection) -> Option
 #[get("/predictions")]
 pub fn get_all_predictions(_auth: Payload, conn: connection) -> Option<JsonValue> {
     predictions::find_all(&conn).map(|prediction| json!(prediction))
+}
+
+#[put("/prediction/<id>",format ="json", data="<prediction>")]
+pub fn put_prediction(id:i32,prediction:Json<UpdatePrediction>,_auth:Payload,conn:connection) -> Option<JsonValue>{
+    predictions::update(&conn,id,&prediction.prediction).map(|prediction|json!(prediction))
 }
 
 #[post("/prediction", format = "json", data = "<new_prediction>")]

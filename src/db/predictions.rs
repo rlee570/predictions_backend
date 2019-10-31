@@ -66,3 +66,25 @@ pub fn find_all(conn: &PgConnection) -> Option<Vec<Prediction>> {
         .map_err(|err| println!("find_all: {}", err))
         .ok()
 }
+
+#[derive(Deserialize,AsChangeset, Default,Clone)]
+#[table_name="predictions"]
+pub struct UpdatePrediction {
+    pub owner: Option<i32>,
+    pub statement: Option<String>,
+    pub expiry: Option<NaiveDateTime>,
+    pub outcome: Option<bool>,
+    pub votes: Option<i32>,
+}
+
+pub fn update(conn: &PgConnection,id:i32,data:&UpdatePrediction) -> Option<Prediction>{
+    let data = &UpdatePrediction{
+        owner:None,
+        expiry:None,
+        ..data.clone()
+    };
+    diesel::update(predictions::table.find(id))
+        .set(data)
+        .get_result(conn)
+        .ok()
+}
