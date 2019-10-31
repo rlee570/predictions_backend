@@ -4,7 +4,6 @@ use crypto::scrypt::{scrypt_check, scrypt_simple, ScryptParams};
 use diesel::pg::PgConnection;
 use diesel::prelude::*;
 use diesel::result::{DatabaseErrorKind, Error};
-use serde::Deserialize;
 
 pub enum UserCreationError {
     DuplicatedEmail,
@@ -49,7 +48,7 @@ pub fn create(
         first_name,
         last_name,
         points: 100,
-        role: "USER",
+        role,
         hash,
     };
     diesel::insert_into(users::table)
@@ -94,5 +93,4 @@ pub fn find_by_email(conn: &PgConnection, email: &str) -> Option<User> {
         .get_result(conn)
         .map_err(|err| eprintln!("find_by_email:{}", err))
         .ok()
-
 }

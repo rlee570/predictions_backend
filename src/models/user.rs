@@ -1,18 +1,10 @@
 use crate::models::user_config as config;
-use chrono::{Duration, Utc, TimeZone};
+use chrono::{Duration, Utc};
 use diesel::Queryable;
 use frank_jwt as jwt;
 use rocket::http::Status;
 use rocket::request::FromRequest;
 use rocket::{Outcome, Request};
-use serde::Serialize;
-//use diesel_derive_enum::DbEnum;
-
-//#[derive(DbEnum)]
-//pub enum UserRole {
-//    ADMIN,
-//    USER,
-//}
 
 #[derive(Queryable, Serialize)]
 pub struct User {
@@ -39,6 +31,7 @@ impl<'a, 'r> FromRequest<'a, 'r> for Payload {
     ///
     /// Handlers with Auth guard will fail with 503 error.
     /// Handlers with Option<Auth> will be called with None.
+    #[allow(non_snake_case)]
     fn from_request(request: &'a Request<'r>) -> Outcome<Payload, (Status, Self::Error), ()> {
         if let Some(Payload) = extract_user_jwt_token_from_request(request) {
             Outcome::Success(Payload)
@@ -65,18 +58,22 @@ fn extract_token_from_header(header: &str) -> Option<&str> {
 }
 
 fn decode_token(token: &str) -> Option<Payload> {
-    jwt::decode(token.trim(), &config::SECRET.to_string(), jwt::Algorithm::HS256)
-        .map(|(_, payload)| {
-            serde_json::from_value::<Payload>(payload)
-                .map_err(|err| {
-                    eprintln!("Decode failed: {:?}", err);
-                })
-                .ok()
-        })
-        .unwrap_or_else(|err| {
-            eprintln!("Jwt decode failed: {:?}", err);
-            None
-        })
+    jwt::decode(
+        token.trim(),
+        &config::SECRET.to_string(),
+        jwt::Algorithm::HS256,
+    )
+    .map(|(_, payload)| {
+        serde_json::from_value::<Payload>(payload)
+            .map_err(|err| {
+                eprintln!("Decode failed: {:?}", err);
+            })
+            .ok()
+    })
+    .unwrap_or_else(|err| {
+        eprintln!("Jwt decode failed: {:?}", err);
+        None
+    })
 }
 
 #[derive(Debug, Deserialize, Serialize)]

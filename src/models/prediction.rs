@@ -1,11 +1,11 @@
-use rocket::config::Datetime;
+use chrono::NaiveDateTime;
 
+#[derive(Queryable, Serialize)]
 pub struct Prediction {
     id: i32,
-    //change to foreign key
     owner: i32,
     statement: String,
-    expiry: Datetime,
+    expiry: NaiveDateTime,
     outcome: bool,
     votes: i32,
 }

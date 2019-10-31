@@ -1,12 +1,7 @@
-use crate::models::user::{User, UserJWT, Payload};
+use crate::models::user::Payload;
 use rocket_contrib::json::{Json, JsonValue};
-//use crate::db::users::NewUser;
 use crate::db;
 use crate::db::Conn;
-use crate::models::user_config as config;
-use frank_jwt as jwt;
-use serde::Deserialize;
-use validator::Validate;
 
 #[derive(Deserialize)]
 pub struct NewUser {
@@ -36,12 +31,12 @@ pub struct LoginData {
 //}
 
 #[get("/user/<id>")]
-pub fn get_user_by_id(id: i32, auth: Payload, conn: db::Conn) -> Option<JsonValue> {
+pub fn get_user_by_id(id: i32, _auth: Payload, conn: db::Conn) -> Option<JsonValue> {
     db::users::find_by_id(&conn, id).map(|user| json!(user))
 }
 
 #[get("/user/email?<email>")]
-pub fn get_user_by_email(email: String, auth: Payload, conn: db::Conn) -> Option<JsonValue> {
+pub fn get_user_by_email(email: String, _auth: Payload, conn: db::Conn) -> Option<JsonValue> {
     db::users::find_by_email(&conn, email.as_ref()).map(|user| json!(user))
 }
 
@@ -56,10 +51,7 @@ pub fn post_create_user(new_user: Json<NewUser>, conn: Conn) -> Result<JsonValue
         "USER",
     )
     .map(|user| json!(user))
-    .map_err(|error| {
-        let field = match error {
-            db => "email",
-        };
+    .map_err(|_error| {
         json!({
             "status":"error",
             "reason":"email already in use"
@@ -71,5 +63,5 @@ pub fn post_create_user(new_user: Json<NewUser>, conn: Conn) -> Result<JsonValue
 pub fn post_user_login(user: Json<LoginData>, conn: Conn) -> Result<JsonValue, JsonValue> {
     db::users::login(&conn, user.email.as_ref(), user.password.as_ref())
         .map(|user| json!({ "user": user.to_user_jwt() }))
-        .ok_or_else(|| json!({"error":"username or password is invalid"}))
+        .ok_or_else(|| json!({"status":"error","reason":"username or password is invalid"}))
 }
