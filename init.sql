@@ -1,0 +1,2 @@
+CREATE DATABASE predictions;
+GRANT ALL PRIVILEGES ON DATABASE predictions TO postgres;
