@@ -15,8 +15,7 @@ pub struct NewPrediction {
     pub owner: i32,
     pub statement: String,
     pub expiry: NaiveDateTime,
-    pub outcome: bool,
-    pub votes: i32,
+    pub outcome: Option<bool>,
 }
 
 impl From<Error> for PredictionError {
@@ -36,15 +35,13 @@ pub fn create(
     owner: &i32,
     statement: &String,
     expiry: NaiveDateTime,
-    outcome: &bool,
-    votes: &i32,
+    outcome: &Option<bool>,
 ) -> Result<Prediction, PredictionError> {
     let new_prediction = &NewPrediction {
         owner: *owner,
         statement: statement.to_string(),
         expiry,
         outcome: *outcome,
-        votes: *votes,
     };
     diesel::insert_into(predictions::table)
         .values(new_prediction)
@@ -63,7 +60,7 @@ pub fn find_by_id(conn: &PgConnection, id: i32) -> Option<Prediction> {
 pub fn find_all(conn: &PgConnection) -> Option<Vec<Prediction>> {
     predictions::table
         .load::<Prediction>(conn)
-        .map_err(|err| println!("find_all: {}", err))
+        .map_err(|err| println!("find_all_predictions: {}", err))
         .ok()
 }
 
@@ -74,7 +71,6 @@ pub struct UpdatePrediction {
     pub statement: Option<String>,
     pub expiry: Option<NaiveDateTime>,
     pub outcome: Option<bool>,
-    pub votes: Option<i32>,
 }
 
 pub fn update(conn: &PgConnection, id: i32, data: &UpdatePrediction) -> Option<Prediction> {

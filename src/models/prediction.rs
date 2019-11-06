@@ -6,6 +6,5 @@ pub struct Prediction {
     owner: i32,
     statement: String,
     expiry: NaiveDateTime,
-    outcome: bool,
-    votes: i32,
+    outcome: Option<bool>,
 }

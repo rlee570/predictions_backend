@@ -4,8 +4,7 @@ table! {
         owner -> Int4,
         statement -> Varchar,
         expiry -> Timestamp,
-        outcome -> Bool,
-        votes -> Int4,
+        outcome -> Nullable<Bool>,
     }
 }
 
@@ -27,11 +26,15 @@ table! {
         prediction -> Int4,
         user_id -> Int4,
         points -> Int4,
+        outcome -> Bool,
     }
 }
 
 joinable!(predictions -> users (owner));
-joinable!(votes -> predictions (prediction));
 joinable!(votes -> users (user_id));
 
-allow_tables_to_appear_in_same_query!(predictions, users, votes,);
+allow_tables_to_appear_in_same_query!(
+    predictions,
+    users,
+    votes,
+);

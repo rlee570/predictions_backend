@@ -10,8 +10,7 @@ pub struct NewPrediction {
     owner: i32,
     statement: String,
     expiry: String,
-    outcome: bool,
-    votes: i32,
+    outcome: Option<bool>,
 }
 
 #[derive(Deserialize)]
@@ -26,7 +25,7 @@ pub fn get_prediction_by_id(id: i32, _auth: Payload, conn: connection) -> Option
 
 #[get("/predictions")]
 pub fn get_all_predictions(_auth: Payload, conn: connection) -> Option<JsonValue> {
-    predictions::find_all(&conn).map(|prediction| json!(prediction))
+    predictions::find_all(&conn).map(|predictions| json!(predictions))
 }
 
 #[put("/prediction/<id>", format = "json", data = "<prediction>")]
@@ -59,13 +58,12 @@ pub fn post_create_prediction(
         &new_prediction.statement,
         datetime,
         &new_prediction.outcome,
-        &new_prediction.votes,
     )
     .map(|prediction| json!(prediction))
     .map_err(|_error| {
         json!({
             "status": "error",
-            "reason":"Failed to create user"
+            "reason":"Failed to create prediciton"
         })
     })
 }

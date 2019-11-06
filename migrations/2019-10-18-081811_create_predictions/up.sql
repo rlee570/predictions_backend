@@ -4,6 +4,5 @@ CREATE TABLE predictions(
     owner integer NOT NULL references users (id),
     statement VARCHAR NOT NULL,
     expiry TIMESTAMP NOT NULL,
-    outcome BOOLEAN NOT NULL,
-    votes INTEGER NOT NULL DEFAULT 0
+    outcome BOOLEAN DEFAULT NULL
 );

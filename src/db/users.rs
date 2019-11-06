@@ -94,3 +94,27 @@ pub fn find_by_email(conn: &PgConnection, email: &str) -> Option<User> {
         .map_err(|err| eprintln!("find_by_email:{}", err))
         .ok()
 }
+
+#[derive(Deserialize, AsChangeset, Default, Clone)]
+#[table_name = "users"]
+pub struct UpdateUser {
+    pub email: Option<String>,
+    pub first_name: Option<String>,
+    pub last_name: Option<String>,
+    pub points: Option<i32>,
+    pub role: Option<String>,
+    pub hash: Option<String>,
+}
+
+pub fn update(conn: &PgConnection, id: i32, data: &UpdateUser) -> Option<User> {
+    let data = &UpdateUser {
+        first_name:None,
+        last_name:None,
+        hash:None,
+        ..data.clone()
+    };
+    diesel::update(users::table.find(id))
+        .set(data)
+        .get_result(conn)
+        .ok()
+}
