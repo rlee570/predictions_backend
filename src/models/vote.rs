@@ -1,8 +1,8 @@
-#[derive(Queryable, Serialize)]
+#[derive(Queryable, Serialize, Debug)]
 pub struct Vote {
-    id: i32,
-    prediction: i32,
-    user_id: i32,
-    points: i32,
-    outcome: bool,
+    pub id: i32,
+    pub prediction: i32,
+    pub user_id: i32,
+    pub points: i32,
+    pub outcome: bool,
 }

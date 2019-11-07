@@ -33,8 +33,4 @@ table! {
 joinable!(predictions -> users (owner));
 joinable!(votes -> users (user_id));
 
-allow_tables_to_appear_in_same_query!(
-    predictions,
-    users,
-    votes,
-);
+allow_tables_to_appear_in_same_query!(predictions, users, votes,);

@@ -67,3 +67,8 @@ pub fn post_create_prediction(
         })
     })
 }
+
+//Allocate points to users
+//put /prediction/outcome
+
+

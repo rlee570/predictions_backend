@@ -108,9 +108,9 @@ pub struct UpdateUser {
 
 pub fn update(conn: &PgConnection, id: i32, data: &UpdateUser) -> Option<User> {
     let data = &UpdateUser {
-        first_name:None,
-        last_name:None,
-        hash:None,
+        first_name: None,
+        last_name: None,
+        hash: None,
         ..data.clone()
     };
     diesel::update(users::table.find(id))

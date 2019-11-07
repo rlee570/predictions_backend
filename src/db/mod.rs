@@ -1,6 +1,7 @@
 use rocket_contrib::databases::diesel;
 
 pub mod predictions;
+pub mod statistics;
 pub mod users;
 pub mod votes;
 

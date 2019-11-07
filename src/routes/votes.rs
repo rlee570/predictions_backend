@@ -1,6 +1,6 @@
-use crate::db::votes;
 use crate::db::users;
 use crate::db::users::UpdateUser as update;
+use crate::db::votes;
 use crate::db::Conn as connection;
 use crate::models::user::Payload;
 use rocket_contrib::json::{Json, JsonValue};
@@ -29,23 +29,23 @@ pub fn post_create_vote(
     _auth: Payload,
     conn: connection,
 ) -> Result<JsonValue, JsonValue> {
-    let user = users::find_by_id(&conn,new_vote.user_id).unwrap();
-    if user.points < new_vote.points{
+    let user = users::find_by_id(&conn, new_vote.user_id).unwrap();
+    if user.points < new_vote.points {
         return Err(json!({
             "status":"error",
             "reason":"Not enough points",
-        }))
-    } else{
+        }));
+    } else {
         let new_points = user.points - new_vote.points;
-        let update = &update{
+        let update = &update {
             email: None,
             first_name: None,
             last_name: None,
             points: Some(new_points),
             role: None,
-            hash: None
+            hash: None,
         };
-        users::update(&conn,user.id,update);
+        users::update(&conn, user.id, update);
     }
     //Create User point check.
     votes::create(

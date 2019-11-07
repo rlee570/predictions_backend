@@ -73,6 +73,7 @@ pub fn start() -> rocket::Rocket {
                 routes::votes::get_vote_by_id,
                 routes::votes::get_all_votes,
                 routes::votes::post_create_vote,
+                routes::statistics::get_statistics_by_id
             ],
         )
         .attach(db::Conn::fairing())
