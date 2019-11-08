@@ -70,6 +70,7 @@ pub fn start() -> rocket::Rocket {
                 routes::predictions::get_all_predictions,
                 routes::predictions::post_create_prediction,
                 routes::predictions::put_prediction,
+                routes::predictions::put_prediction_outcome,
                 routes::votes::get_vote_by_id,
                 routes::votes::get_all_votes,
                 routes::votes::post_create_vote,

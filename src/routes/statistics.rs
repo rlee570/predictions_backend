@@ -1,7 +1,7 @@
 use crate::db::statistics;
 use crate::db::Conn as connection;
 use crate::models::user::Payload;
-use rocket_contrib::json::{Json, JsonValue};
+use rocket_contrib::json::JsonValue;
 
 #[get("/statistics/<id>")]
 pub fn get_statistics_by_id(

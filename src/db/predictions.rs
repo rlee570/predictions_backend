@@ -84,3 +84,16 @@ pub fn update(conn: &PgConnection, id: i32, data: &UpdatePrediction) -> Option<P
         .get_result(conn)
         .ok()
 }
+
+pub fn update_outcome(conn: &PgConnection, id: i32, outcome: bool) -> Option<Prediction> {
+    let update = &UpdatePrediction {
+        owner: None,
+        statement: None,
+        expiry: None,
+        outcome: Some(outcome),
+    };
+    diesel::update(predictions::table.find(id))
+        .set(update)
+        .get_result(conn)
+        .ok()
+}

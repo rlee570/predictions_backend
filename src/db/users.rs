@@ -1,5 +1,6 @@
 use crate::models::user::User;
 use crate::schema::users;
+use crate::schema::users::columns::points;
 use crypto::scrypt::{scrypt_check, scrypt_simple, ScryptParams};
 use diesel::pg::PgConnection;
 use diesel::prelude::*;
@@ -115,6 +116,13 @@ pub fn update(conn: &PgConnection, id: i32, data: &UpdateUser) -> Option<User> {
     };
     diesel::update(users::table.find(id))
         .set(data)
+        .get_result(conn)
+        .ok()
+}
+
+pub fn update_points(conn: &PgConnection, id: i32, points_to_add: i32) -> Option<User> {
+    diesel::update(users::table.find(id))
+        .set(points.eq(points + points_to_add))
         .get_result(conn)
         .ok()
 }

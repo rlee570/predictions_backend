@@ -1,8 +1,10 @@
 use crate::db::predictions;
 use crate::db::predictions::UpdatePrediction as update;
+use crate::db::users;
+use crate::db::votes;
 use crate::db::Conn as connection;
-use crate::models::user::Payload;
-use chrono::NaiveDate;
+use crate::models::user::{Payload, User};
+use chrono::DateTime;
 use rocket_contrib::json::{Json, JsonValue};
 
 #[derive(Deserialize)]
@@ -44,14 +46,9 @@ pub fn post_create_prediction(
     _auth: Payload,
     conn: connection,
 ) -> Result<JsonValue, JsonValue> {
-    let split: Vec<&str> = new_prediction.expiry.split(".").collect();
-    let year: i32 = split[0].parse::<i32>().unwrap();
-    let slice = split[1..]
-        .into_iter()
-        .map(|x| x.parse().unwrap())
-        .collect::<Vec<u32>>();
-    let datetime =
-        NaiveDate::from_ymd(year, slice[0], slice[1]).and_hms(slice[2], slice[3], slice[4]);
+    let datetime = DateTime::parse_from_rfc3339(&new_prediction.expiry)
+        .unwrap()
+        .naive_utc();
     predictions::create(
         &conn,
         &new_prediction.owner,
@@ -63,12 +60,28 @@ pub fn post_create_prediction(
     .map_err(|_error| {
         json!({
             "status": "error",
-            "reason":"Failed to create prediciton"
+            "reason":"Failed to create prediction"
         })
     })
 }
 
-//Allocate points to users
-//put /prediction/outcome
+#[derive(Deserialize)]
+pub struct Outcome {
+    outcome: bool,
+}
 
-
+#[put("/prediction/outcome/<id>", format = "json", data = "<outcome>")]
+pub fn put_prediction_outcome(
+    id: i32,
+    outcome: Json<Outcome>,
+    _auth: Payload,
+    conn: connection,
+) -> Option<JsonValue> {
+    predictions::update_outcome(&conn, id, outcome.outcome);
+    let result: Vec<User> = votes::find_by_prediction_id_and_outcome(&conn, id, outcome.outcome)
+        .unwrap()
+        .iter()
+        .map(|vote| users::update_points(&conn, vote.user_id, vote.points).unwrap())
+        .collect();
+    Some(json!(result))
+}

@@ -6,7 +6,7 @@ use rocket::http::Status;
 use rocket::request::FromRequest;
 use rocket::{Outcome, Request};
 
-#[derive(Queryable, Serialize)]
+#[derive(Queryable, Serialize, Debug)]
 pub struct User {
     pub id: i32,
     pub email: String,
