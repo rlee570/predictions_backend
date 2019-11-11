@@ -20,14 +20,7 @@ mod routes;
 mod schema;
 
 fn make_cors() -> Cors {
-    let allowed_origins = AllowedOrigins::some_exact(&[
-        "http://localhost:8000",
-        "http://localhost:3000",
-        "http://0.0.0.0:8000",
-        "http://0.0.0.0:3000",
-        "http://127.0.0.1:8000",
-        "http://127.0.0.1:3000",
-    ]);
+    let allowed_origins = AllowedOrigins::all();
     CorsOptions {
         allowed_origins,
         allowed_methods: vec![Method::Get, Method::Post, Method::Put]
