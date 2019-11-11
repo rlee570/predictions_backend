@@ -59,7 +59,6 @@ fn extract_token_from_header(header: &str) -> Option<&str> {
 }
 
 fn decode_token(token: &str) -> Option<Payload> {
-    println!("{:?}", token);
     jwt::decode(
         token.trim(),
         &config::SECRET.to_string(),
