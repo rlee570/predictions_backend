@@ -6,8 +6,10 @@ You need to install Rust and then cargo run to run the server.
 Also requires postgressql now includes an init.sql to run against your postgresql.
 
 # Alternatively
-Use docker to build. Change to the directory in terminal to the project
-then run:
+Use docker to build. You need the .env file for this to work as the database url
+will not be set otherwise. It is not stored in the repository. 
+
+Change to the directory in terminal to the project then run:
 
 ```docker build -t zuehlke_predictions_backend .```
 

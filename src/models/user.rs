@@ -2,6 +2,7 @@ use crate::models::user_config as config;
 use chrono::{Duration, Utc};
 use diesel::Queryable;
 use frank_jwt as jwt;
+use frank_jwt::ValidationOptions;
 use rocket::http::Status;
 use rocket::request::FromRequest;
 use rocket::{Outcome, Request};
@@ -58,10 +59,12 @@ fn extract_token_from_header(header: &str) -> Option<&str> {
 }
 
 fn decode_token(token: &str) -> Option<Payload> {
+    println!("{:?}", token);
     jwt::decode(
         token.trim(),
         &config::SECRET.to_string(),
         jwt::Algorithm::HS256,
+        &ValidationOptions::default(),
     )
     .map(|(_, payload)| {
         serde_json::from_value::<Payload>(payload)
@@ -78,15 +81,15 @@ fn decode_token(token: &str) -> Option<Payload> {
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Payload {
-    pub expiry: i64,
+    pub exp: i64,
     pub id: i32,
     pub email: String,
 }
 
 impl Payload {
-    pub fn new(expiry: i64, id: i32, email: &str) -> Payload {
+    pub fn new(exp: i64, id: i32, email: &str) -> Payload {
         Payload {
-            expiry,
+            exp,
             id,
             email: email.to_string(),
         }
@@ -117,7 +120,7 @@ impl User {
     pub fn to_user_jwt(&self) -> UserJWT {
         let headers = json!({});
         let exp = Utc::now() + Duration::days(30);
-        let timestamp = exp.timestamp();
+        let timestamp = exp.timestamp_millis();
         let payload = json!(Payload::new(timestamp, self.id, self.email.as_str()));
         let token = jwt::encode(
             headers.0,
