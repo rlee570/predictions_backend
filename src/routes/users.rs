@@ -1,6 +1,9 @@
 use crate::db;
 use crate::db::Conn;
 use crate::models::user::Payload;
+use rocket::http::Status;
+use rocket::response::status;
+use rocket::response::status::Custom;
 use rocket_contrib::json::{Json, JsonValue};
 
 #[derive(Deserialize)]
@@ -41,7 +44,10 @@ pub fn get_user_by_email(email: String, _auth: Payload, conn: db::Conn) -> Optio
 }
 
 #[post("/user", format = "json", data = "<new_user>")]
-pub fn post_create_user(new_user: Json<NewUser>, conn: Conn) -> Result<JsonValue, JsonValue> {
+pub fn post_create_user(
+    new_user: Json<NewUser>,
+    conn: Conn,
+) -> Result<JsonValue, Custom<Json<JsonValue>>> {
     db::users::create(
         &conn,
         new_user.email.as_ref(),
@@ -50,18 +56,29 @@ pub fn post_create_user(new_user: Json<NewUser>, conn: Conn) -> Result<JsonValue
         new_user.last_name.as_ref(),
         "USER",
     )
-    .map(|user| json!(user))
+    .map(|user| json!({ "user": user }))
     .map_err(|_error| {
-        json!({
-            "status":"error",
-            "reason":"email already in use"
-        })
+        status::Custom(
+            Status::InternalServerError,
+            Json(json!({
+                "status":"error",
+                "reason":"email already in use"
+            })),
+        )
     })
 }
 
 #[post("/user/login", format = "json", data = "<user>")]
-pub fn post_user_login(user: Json<LoginData>, conn: Conn) -> Result<JsonValue, JsonValue> {
+pub fn post_user_login(
+    user: Json<LoginData>,
+    conn: Conn,
+) -> Result<JsonValue, Custom<Json<JsonValue>>> {
     db::users::login(&conn, user.email.as_ref(), user.password.as_ref())
         .map(|user| json!({ "user": user.to_user_jwt() }))
-        .ok_or_else(|| json!({"status":"error","reason":"username or password is invalid"}))
+        .ok_or_else(|| {
+            status::Custom(
+                Status::InternalServerError,
+                Json(json!({"status":"error","reason":"username or password is invalid"})),
+            )
+        })
 }

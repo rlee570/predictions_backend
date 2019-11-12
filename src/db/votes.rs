@@ -57,7 +57,11 @@ pub fn find_by_id(conn: &PgConnection, id: i32) -> Option<Vote> {
         .ok()
 }
 
-pub fn find_by_prediction_id_and_outcome(conn: &PgConnection, id: i32, outcome: bool) -> Option<Vec<Vote>> {
+pub fn find_by_prediction_id_and_outcome(
+    conn: &PgConnection,
+    id: i32,
+    outcome: bool,
+) -> Option<Vec<Vote>> {
     votes::table
         .filter(votes::prediction.eq(id))
         .filter(votes::outcome.eq(outcome))

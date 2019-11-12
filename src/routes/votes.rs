@@ -3,6 +3,8 @@ use crate::db::users::UpdateUser as update;
 use crate::db::votes;
 use crate::db::Conn as connection;
 use crate::models::user::Payload;
+use rocket::response::status;
+use rocket::response::status::Custom;
 use rocket_contrib::json::{Json, JsonValue};
 
 #[derive(Deserialize)]
@@ -28,7 +30,7 @@ pub fn post_create_vote(
     new_vote: Json<NewVote>,
     _auth: Payload,
     conn: connection,
-) -> Result<JsonValue, JsonValue> {
+) -> Result<JsonValue, Custom<Json<JsonValuen>>> {
     let user = users::find_by_id(&conn, new_vote.user_id).unwrap();
     if user.points < new_vote.points {
         return Err(json!({
@@ -57,9 +59,12 @@ pub fn post_create_vote(
     )
     .map(|vote| json!(vote))
     .map_err(|_error| {
-        json!({
-            "status": "error",
-            "reason":"Failed to create vote"
-        })
+        status::Custom(
+            Status::InternalServerError,
+            Json(json!({
+                "status": "error",
+                "reason":"Failed to create vote"
+            })),
+        )
     })
 }

@@ -5,6 +5,8 @@ use crate::db::votes;
 use crate::db::Conn as connection;
 use crate::models::user::{Payload, User};
 use chrono::DateTime;
+use rocket::response::status;
+use rocket::response::status::Custom;
 use rocket_contrib::json::{Json, JsonValue};
 
 #[derive(Deserialize)]
@@ -45,7 +47,7 @@ pub fn post_create_prediction(
     new_prediction: Json<NewPrediction>,
     _auth: Payload,
     conn: connection,
-) -> Result<JsonValue, JsonValue> {
+) -> Result<JsonValue, Custom<Json<JsonValuen>>> {
     let datetime = DateTime::parse_from_rfc3339(&new_prediction.expiry)
         .unwrap()
         .naive_utc();
@@ -58,10 +60,13 @@ pub fn post_create_prediction(
     )
     .map(|prediction| json!(prediction))
     .map_err(|_error| {
-        json!({
-            "status": "error",
-            "reason":"Failed to create prediction"
-        })
+        status::Custom(
+            Status::InternalServerError,
+            Json(json!({
+                "status": "error",
+                "reason":"Failed to create prediction"
+            })),
+        )
     })
 }
 
