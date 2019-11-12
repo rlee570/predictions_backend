@@ -5,6 +5,7 @@ use crate::db::votes;
 use crate::db::Conn as connection;
 use crate::models::user::{Payload, User};
 use chrono::DateTime;
+use rocket::http::Status;
 use rocket::response::status;
 use rocket::response::status::Custom;
 use rocket_contrib::json::{Json, JsonValue};
@@ -47,7 +48,7 @@ pub fn post_create_prediction(
     new_prediction: Json<NewPrediction>,
     _auth: Payload,
     conn: connection,
-) -> Result<JsonValue, Custom<Json<JsonValuen>>> {
+) -> Result<JsonValue, Custom<Json<JsonValue>>> {
     let datetime = DateTime::parse_from_rfc3339(&new_prediction.expiry)
         .unwrap()
         .naive_utc();
