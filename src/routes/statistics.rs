@@ -9,7 +9,6 @@ use rocket_contrib::json::{Json, JsonValue};
 #[get("/statistics/<id>")]
 pub fn get_statistics_by_id(
     id: i32,
-    _auth: Payload,
     conn: connection,
 ) -> Result<JsonValue, Custom<Json<JsonValue>>> {
     statistics::create(&conn, id)

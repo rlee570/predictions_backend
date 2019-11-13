@@ -29,7 +29,7 @@ pub fn get_prediction_by_id(id: i32, _auth: Payload, conn: connection) -> Option
 }
 
 #[get("/predictions")]
-pub fn get_all_predictions(_auth: Payload, conn: connection) -> Option<JsonValue> {
+pub fn get_all_predictions(conn: connection) -> Option<JsonValue> {
     predictions::find_all(&conn).map(|predictions| json!(predictions))
 }
 
