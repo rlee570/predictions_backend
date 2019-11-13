@@ -23,4 +23,5 @@ CMD su - postgres -c '/usr/lib/postgresql/12/bin/initdb -D /var/lib/postgresql/d
     && diesel setup \
     && diesel migration run \
     && cargo install --path . \
+    && su - postgres -c 'cd /usr/src/zuhlke_predictions_backend && psql predictions -h 127.0.0.1 -f dummy.sql' \
     && zuehlke_predictions_backend
