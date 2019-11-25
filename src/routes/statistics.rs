@@ -1,6 +1,5 @@
 use crate::db::statistics;
 use crate::db::Conn as connection;
-use crate::models::user::Payload;
 use rocket::http::Status;
 use rocket::response::status;
 use rocket::response::status::Custom;
