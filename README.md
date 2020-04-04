@@ -1,4 +1,4 @@
-# zuehlke_predictions_backend
+# Predictions_backend
 Backend for the predictions platform
 
 # To build and run
